@@ -19,7 +19,7 @@ compile project(':easyYT')
 ```gradle
 include ':easyYT'
 ```
-- Get YouTube Data API v3 key OAuth 2.0 for your project here:
+- Get YouTube Data API OAuth 2.0 key for your project here:
   https://console.developers.google.com.
   You don't need use your key anywhere. you may need to wait some minutes for let Google process the key)
 
