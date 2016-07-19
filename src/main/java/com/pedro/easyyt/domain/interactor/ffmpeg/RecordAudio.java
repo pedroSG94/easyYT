@@ -1,8 +1,8 @@
-package com.pedro.easyyt.ffmpeg;
+package com.pedro.easyyt.domain.interactor.ffmpeg;
 
 import android.media.AudioRecord;
 import android.util.Log;
-import com.pedro.easyyt.model.RecordDataConfig;
+import com.pedro.easyyt.domain.model.RecordDataConfig;
 import java.nio.ShortBuffer;
 import org.bytedeco.javacv.FFmpegFrameRecorder;
 
@@ -33,28 +33,19 @@ public class RecordAudio implements Runnable{
     ShortBuffer audioData;
     int bufferReadResult;
 
-    //int bufferSize;
-    //bufferSize = AudioRecord.getMinBufferSize(dataConfig.getAudioRateInHz(), AudioFormat.CHANNEL_IN_MONO,
-    //    AudioFormat.ENCODING_PCM_16BIT);
-    //audioRecord = new AudioRecord(MediaRecorder.AudioSource.MIC, dataConfig.getAudioRateInHz(),
-    //    AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT, bufferSize);
-
     audioData = ShortBuffer.allocate(bufferSize);
 
     Log.d(TAG, "audioRecord.startRecording()");
     audioRecord.startRecording();
 
-/* ffmpeg_audio encoding loop */
+/** ffmpeg_audio encoding loop */
     while (runAudioThread) {
 
       bufferReadResult = audioRecord.read(audioData.array(), 0, audioData.capacity());
       audioData.limit(bufferReadResult);
       if (bufferReadResult > 0) {
         Log.v(TAG,"bufferReadResult: " + bufferReadResult);
-        // If "recording" isn't true when start this thread, it never get's set according to this if statement...!!!
-        // Why? Good question...
         if (recording) {
-          //if (RECORD_LENGTH <= 0)
           try {
             recorder.recordSamples(audioData);
           }

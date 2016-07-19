@@ -1,23 +1,30 @@
 package com.pedro.easyyt.youtubewrapper;
 
-import android.app.Activity;
 import android.hardware.Camera;
 import android.util.Log;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
-import com.pedro.easyyt.ffmpeg.RecordManager;
-import com.pedro.easyyt.ffmpeg.EasyYTView;
-import com.pedro.easyyt.model.RecordDataConfig;
+import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
+import com.pedro.easyyt.app.executor.InteractorExecutor;
+import com.pedro.easyyt.app.executor.InteractorExecutorImp;
+import com.pedro.easyyt.app.executor.MainThreadExecutor;
+import com.pedro.easyyt.app.executor.MainThreadExecutorImp;
+import com.pedro.easyyt.domain.interactor.youtube.createevent.CreateEventInteractorImp;
+import com.pedro.easyyt.domain.interactor.youtube.endevent.EndEventInteractorImp;
+import com.pedro.easyyt.domain.interactor.youtube.startevent.StartEventInteractorImp;
+import com.pedro.easyyt.domain.model.StreamDataInfo;
+import com.pedro.easyyt.domain.interactor.ffmpeg.EasyYTView;
+import com.pedro.easyyt.domain.model.RecordDataConfig;
+import com.pedro.easyyt.presenter.YouTubePresenter;
+import com.pedro.easyyt.presenter.YouTubePresenterImp;
 
 /**
  * Created by pedro on 6/05/16.
  */
-public class EasyStream implements SendData {
+public class EasyStream implements YouTubeComunication {
 
   private final String TAG = EasyStream.class.toString();
 
-  private RecordManager recordManager;
   private EasyYTView easyYTView;
-  private Activity activity;
   private GoogleAccountCredential credential;
   private Camera camera;
   private RecordDataConfig dataConfig;
@@ -28,12 +35,22 @@ public class EasyStream implements SendData {
   private String id;
   private boolean streaming;
 
+  private YouTubePresenter youTubePresenter;
+  private StreamDataInfo streamDataInfo;
+  private EasyYTCallback easyYTCallback;
+
   public EasyStream(){
-    streaming = false;
+    MainThreadExecutor mainThreadExecutor = new MainThreadExecutorImp();
+    InteractorExecutor interactorExecutor = new InteractorExecutorImp();
+    youTubePresenter = new YouTubePresenterImp(
+            new CreateEventInteractorImp(interactorExecutor, mainThreadExecutor),
+            new StartEventInteractorImp(interactorExecutor, mainThreadExecutor),
+            new EndEventInteractorImp(interactorExecutor, mainThreadExecutor));
+    youTubePresenter.setView(this);
   }
 
-  public void setActivity(Activity activity) {
-    this.activity = activity;
+  public void setEasyYTCallback(EasyYTCallback easyYTCallback) {
+    this.easyYTCallback = easyYTCallback;
   }
 
   public void setEasyYTView(EasyYTView easyYTView) {
@@ -71,7 +88,7 @@ public class EasyStream implements SendData {
   public void startStream(){
     Log.d(TAG, "starting...");
     if(id == null) {
-      new CreateEvent(activity, this, credential, name, description, resolution, state).execute();
+      youTubePresenter.startStream(credential, name, description, resolution, state, easyYTView, dataConfig, camera);
     }
     else{
       Log.e(TAG, "you are streaming, stop it if you want start other stream");
@@ -81,10 +98,8 @@ public class EasyStream implements SendData {
   public void stopStream(){
     Log.d(TAG, "stopping stream...");
     if(id != null) {
-      new EndEvent(credential, id).execute();
-      recordManager.stopRecording();
+      youTubePresenter.stopStream(credential, streamDataInfo.getLiveBroadcast().getId());
       id = null;
-      streaming = false;
     }
     else{
       Log.e(TAG, "no event created, you cant stop anything");
@@ -96,15 +111,50 @@ public class EasyStream implements SendData {
   }
 
   @Override
-  public void youtubeUrl(String url) {
-    Log.d(TAG, "sending data to youtube...");
-    recordManager = new RecordManager(url, easyYTView, dataConfig, camera);
-    recordManager.startRecording();
+  public void streamData(StreamDataInfo streamDataInfo) {
+    this.streamDataInfo = streamDataInfo;
+    id = streamDataInfo.getLiveBroadcast().getId();
+  }
+
+  @Override
+  public void streamingStarted() {
+    easyYTCallback.streamingStarted();
     streaming = true;
   }
 
   @Override
-  public void youtubeId(String id) {
-    this.id = id;
+  public void streamingStopped() {
+    easyYTCallback.streamingStopped();
+    streaming = false;
+  }
+
+  @Override
+  public void createEventSuccess(StreamDataInfo streamDataInfo, String endPoint) {
+    easyYTCallback.createEventSuccess(streamDataInfo, endPoint);
+  }
+
+  @Override
+  public void startEventSuccess() {
+    easyYTCallback.startEventSuccess();
+  }
+
+  @Override
+  public void endEventSuccess() {
+    easyYTCallback.endEventSuccess();
+  }
+
+  @Override
+  public void onError(String error) {
+    easyYTCallback.onError(error);
+  }
+
+  @Override
+  public void onErrorStartActivityForResult(UserRecoverableAuthIOException e) {
+    easyYTCallback.onErrorStartActivityForResult(e);
+  }
+
+  @Override
+  public void onErrorStartActivityForResult2(IllegalArgumentException e) {
+    easyYTCallback.onErrorStartActivityForResult2(e);
   }
 }

@@ -1,4 +1,4 @@
-package com.pedro.easyyt.base;
+package com.pedro.easyyt.app.base;
 
 import android.accounts.AccountManager;
 import android.app.Activity;
@@ -10,6 +10,7 @@ import android.preference.PreferenceManager;
 import android.support.multidex.MultiDex;
 import android.util.Log;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
+import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
 import com.google.api.client.util.ExponentialBackOff;
 import com.pedro.easyyt.constants.Constants;
 import java.util.Arrays;
@@ -58,9 +59,11 @@ public class EasyYTActivity extends Activity {
     super.onActivityResult(requestCode, resultCode, data);
     switch (requestCode){
       case Constants.REQUEST_ACCOUNT_PICKER:
-        String account = data.getExtras().getString(AccountManager.KEY_ACCOUNT_NAME);
-        credential.setSelectedAccountName(account);
-        saveAccount(account);
+        if(data != null) {
+          String account = data.getExtras().getString(AccountManager.KEY_ACCOUNT_NAME);
+          credential.setSelectedAccountName(account);
+          saveAccount(account);
+        }
       case Constants.REQUEST_AUTHORIZATION:
         if(resultCode != Activity.RESULT_OK){
           chooseAccount();
@@ -81,6 +84,14 @@ public class EasyYTActivity extends Activity {
   }
 
   protected void changeAccount(){
+    startActivityForResult(credential.newChooseAccountIntent(), Constants.REQUEST_ACCOUNT_PICKER);
+  }
+
+  protected void startActivityForResult(UserRecoverableAuthIOException e){
+    startActivityForResult(e.getIntent(), Constants.REQUEST_AUTHORIZATION);
+  }
+
+  protected void startActivityForResult2(IllegalArgumentException e){
     startActivityForResult(credential.newChooseAccountIntent(), Constants.REQUEST_ACCOUNT_PICKER);
   }
 

@@ -1,4 +1,4 @@
-package com.pedro.easyyt.model;
+package com.pedro.easyyt.domain.model;
 
 import android.util.Log;
 import com.pedro.easyyt.constants.Resolution;
@@ -22,7 +22,7 @@ public class RecordDataConfig {
       resolutionHeight = 240;
     }
     else if (resolution == Resolution.R_480P){
-      resolutionWidth = 620;
+      resolutionWidth = 640;
       resolutionHeight = 480;
     }
     else if (resolution == Resolution.R_720P){

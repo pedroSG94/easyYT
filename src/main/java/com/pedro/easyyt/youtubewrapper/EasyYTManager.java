@@ -16,8 +16,8 @@ import com.google.api.services.youtube.model.LiveStreamSnippet;
 import com.google.api.services.youtube.model.MonitorStreamInfo;
 import com.pedro.easyyt.constants.Constants;
 import com.pedro.easyyt.constants.StreamState;
-import com.pedro.easyyt.model.EventData;
-import com.pedro.easyyt.model.StreamDataInfo;
+import com.pedro.easyyt.domain.model.EventData;
+import com.pedro.easyyt.domain.model.StreamDataInfo;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -31,82 +31,6 @@ import java.util.TimeZone;
 public class EasyYTManager {
 
   private static final String TAG = EasyYTManager.class.toString();
-
-  public static StreamDataInfo createLiveEvent(YouTube youtube, String name,
-      String description, String resolution, String state) throws IOException{
-    SimpleDateFormat dateFormat = new SimpleDateFormat(
-        "yyyy-MM-dd'T'HH:mm:ss'Z'");
-    dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-    long futureDateMillis = System.currentTimeMillis()
-        + Constants.FUTURE_DATE_OFFSET_MILLIS;
-    Date futureDate = new Date();
-    futureDate.setTime(futureDateMillis);
-    String date = dateFormat.format(futureDate);
-
-    Log.i("pedroTest", String.format(
-        "Creating event: name='%s', description='%s', date='%s'.",
-        name, description, date));
-
-      LiveBroadcastSnippet broadcastSnippet = new LiveBroadcastSnippet();
-      broadcastSnippet.setTitle(name);
-      broadcastSnippet.setScheduledStartTime(new DateTime(futureDate));
-
-      LiveBroadcastContentDetails contentDetails = new LiveBroadcastContentDetails();
-      MonitorStreamInfo monitorStream = new MonitorStreamInfo();
-      monitorStream.setEnableMonitorStream(false);
-      contentDetails.setMonitorStream(monitorStream);
-
-      // Create LiveBroadcastStatus with privacy status.
-      LiveBroadcastStatus status = new LiveBroadcastStatus();
-      status.setPrivacyStatus(state);
-
-      LiveBroadcast broadcast = new LiveBroadcast();
-      broadcast.setKind(Constants.BROADCAST);
-      broadcast.setSnippet(broadcastSnippet);
-      broadcast.setStatus(status);
-      broadcast.setContentDetails(contentDetails);
-
-      // Create the insert request
-      YouTube.LiveBroadcasts.Insert liveBroadcastInsert = youtube
-          .liveBroadcasts().insert("snippet,status,contentDetails",
-              broadcast);
-
-      // Request is executed and inserted broadcast is returned
-      LiveBroadcast returnedBroadcast = liveBroadcastInsert.execute();
-
-      // Create a snippet with title.
-      LiveStreamSnippet streamSnippet = new LiveStreamSnippet();
-      streamSnippet.setTitle(name);
-
-      // Create content distribution network with format and ingestion
-      // type.
-      CdnSettings cdn = new CdnSettings();
-      cdn.setFormat(resolution);
-      cdn.setIngestionType("rtmp");
-
-      LiveStream stream = new LiveStream();
-      stream.setKind(Constants.STREAM);
-      stream.setSnippet(streamSnippet);
-      stream.setCdn(cdn);
-
-      // Create the insert request
-      YouTube.LiveStreams.Insert liveStreamInsert = youtube.liveStreams()
-          .insert("snippet,cdn", stream);
-
-      // Request is executed and inserted stream is returned
-      LiveStream returnedStream = liveStreamInsert.execute();
-
-      // Create the bind request
-      YouTube.LiveBroadcasts.Bind liveBroadcastBind = youtube
-          .liveBroadcasts().bind(returnedBroadcast.getId(),
-              "id,contentDetails");
-
-      // Set stream id to bind
-      liveBroadcastBind.setStreamId(returnedStream.getId());
-
-      // Request is executed and bound broadcast is returned
-      return new StreamDataInfo(liveBroadcastBind.execute(), returnedStream);
-  }
 
   public static List<EventData> getLiveEvents(
       YouTube youtube) throws IOException {
@@ -153,26 +77,5 @@ public class EasyYTManager {
     IngestionInfo ingestionInfo = streamList.get(0).getCdn().getIngestionInfo();
     return ingestionInfo.getIngestionAddress() + "/"
         + ingestionInfo.getStreamName();
-  }
-
-  public static void startEvent(YouTube youtube, String broadcastId)
-      throws IOException {
-
-    try {
-      Thread.sleep(10000);
-    } catch (InterruptedException e) {
-      Log.e(TAG, "", e);
-    }
-
-    YouTube.LiveBroadcasts.Transition
-        transitionRequest = youtube.liveBroadcasts().transition("live", broadcastId, "status");
-    transitionRequest.execute();
-  }
-
-  public static void endEvent(YouTube youtube, String broadcastId)
-      throws IOException {
-    YouTube.LiveBroadcasts.Transition transitionRequest = youtube.liveBroadcasts().transition(
-        StreamState.COMPLETE, broadcastId, "status");
-    transitionRequest.execute();
   }
 }

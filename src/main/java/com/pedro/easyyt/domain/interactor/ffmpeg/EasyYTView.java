@@ -1,4 +1,4 @@
-package com.pedro.easyyt.ffmpeg;
+package com.pedro.easyyt.domain.interactor.ffmpeg;
 
 import android.content.Context;
 import android.hardware.Camera;
@@ -7,7 +7,9 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import com.pedro.easyyt.model.RecordDataConfig;
+
+import com.pedro.easyyt.domain.model.RecordDataConfig;
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Collections;
@@ -78,11 +80,11 @@ public class EasyYTView extends SurfaceView implements SurfaceHolder.Callback, C
       }
       camParams.setPreviewSize(dataConfig.getResolutionWidth(), dataConfig.getResolutionHeight());
       Log.d(TAG, "Setting resolutionWidth: "
-          + dataConfig.getResolutionWidth()
-          + " resolutionHeight: "
-          + dataConfig.getResolutionHeight()
-          + " frameRate: "
-          + dataConfig.getFrameRate());
+              + dataConfig.getResolutionWidth()
+              + " resolutionHeight: "
+              + dataConfig.getResolutionHeight()
+              + " frameRate: "
+              + dataConfig.getFrameRate());
       camParams.setPreviewFrameRate(dataConfig.getFrameRate());
       Log.d(TAG, "Preview Framerate: " + camParams.getPreviewFrameRate());
       camera.setParameters(camParams);
@@ -199,11 +201,11 @@ public class EasyYTView extends SurfaceView implements SurfaceHolder.Callback, C
       }
       camParams.setPreviewSize(dataConfig.getResolutionWidth(), dataConfig.getResolutionHeight());
       Log.d(TAG, "Setting resolutionWidth: "
-          + dataConfig.getResolutionWidth()
-          + " resolutionHeight: "
-          + dataConfig.getResolutionHeight()
-          + " frameRate: "
-          + dataConfig.getFrameRate());
+              + dataConfig.getResolutionWidth()
+              + " resolutionHeight: "
+              + dataConfig.getResolutionHeight()
+              + " frameRate: "
+              + dataConfig.getFrameRate());
       camParams.setPreviewFrameRate(dataConfig.getFrameRate());
       Log.d(TAG, "Preview Framerate: " + camParams.getPreviewFrameRate());
       camera.setParameters(camParams);

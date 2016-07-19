@@ -1,4 +1,4 @@
-package com.pedro.easyyt.model;
+package com.pedro.easyyt.domain.model;
 
 import com.google.api.services.youtube.model.LiveBroadcast;
 

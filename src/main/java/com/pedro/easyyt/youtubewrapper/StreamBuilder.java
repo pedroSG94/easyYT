@@ -1,14 +1,13 @@
 package com.pedro.easyyt.youtubewrapper;
 
-import android.app.Activity;
 import android.hardware.Camera;
 import android.util.Log;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.pedro.easyyt.constants.Resolution;
 import com.pedro.easyyt.constants.StreamState;
 import com.pedro.easyyt.exceptions.CameraException;
-import com.pedro.easyyt.ffmpeg.EasyYTView;
-import com.pedro.easyyt.model.RecordDataConfig;
+import com.pedro.easyyt.domain.interactor.ffmpeg.EasyYTView;
+import com.pedro.easyyt.domain.model.RecordDataConfig;
 
 /**
  * Created by pedro on 6/05/16.
@@ -20,7 +19,7 @@ public class StreamBuilder {
   private static volatile StreamBuilder myInstance = null;
 
   private EasyYTView easyYTView;
-  private Activity activity;
+  private EasyYTCallback easyYTCallback;
   private GoogleAccountCredential credential;
   private String resolution = Resolution.R_240P;
   private String name = "easyyt_name";
@@ -57,8 +56,8 @@ public class StreamBuilder {
     return this;
   }
 
-  public StreamBuilder setActivity(Activity activity){
-    this.activity = activity;
+  public StreamBuilder setEastYTCallback(EasyYTCallback easyYTCallback){
+    this.easyYTCallback = easyYTCallback;
     return this;
   }
 
@@ -101,7 +100,7 @@ public class StreamBuilder {
   public EasyStream build(){
     try {
       Camera camera = Camera.open();
-      camera.setDisplayOrientation(90);
+      camera.setDisplayOrientation(0);
 
       RecordDataConfig dataConfig = new RecordDataConfig();
       dataConfig.setFrameRate(frameRate);
@@ -109,7 +108,7 @@ public class StreamBuilder {
       dataConfig.setResolution(resolution);
 
       EasyStream easyStream = new EasyStream();
-      easyStream.setActivity(activity);
+      easyStream.setEasyYTCallback(easyYTCallback);
       easyStream.setEasyYTView(easyYTView);
       easyStream.setCredential(credential);
       easyStream.setCamera(camera);

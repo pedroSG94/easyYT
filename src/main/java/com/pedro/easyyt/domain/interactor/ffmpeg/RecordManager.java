@@ -1,11 +1,11 @@
-package com.pedro.easyyt.ffmpeg;
+package com.pedro.easyyt.domain.interactor.ffmpeg;
 
 import android.hardware.Camera;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.util.Log;
-import com.pedro.easyyt.model.RecordDataConfig;
+import com.pedro.easyyt.domain.model.RecordDataConfig;
 import org.bytedeco.javacv.FFmpegFrameRecorder;
 
 /**
