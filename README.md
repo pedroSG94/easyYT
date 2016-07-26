@@ -22,6 +22,13 @@ include ':easyYT'
 - Get YouTube Data API OAuth 2.0 key for your project here (You don't need use your key anywhere. You may need to wait some      minutes for let Google process the key):
   https://console.developers.google.com
 
+#Permisisons
+
+```xml
+<uses-permission android:name="android.permission.INTERNET"/><uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/><!-- For authorization. -->
+<uses-permission android:name="android.permission.GET_ACCOUNTS"/><!-- For recording audio and video without going to lock.
+--><uses-permission android:name="android.permission.RECORD_AUDIO"/><uses-permission android:name="android.permission.WAKE_LOCK"/><uses-permission android:name="android.permission.CAMERA"/>
+```
 #Code example
 
 ```java
