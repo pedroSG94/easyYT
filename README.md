@@ -22,7 +22,7 @@ include ':easyYT'
 - Get YouTube Data API OAuth 2.0 key for your project here (You don't need use your key anywhere. You may need to wait some      minutes for let Google process the key):
   https://console.developers.google.com
 
-#Permisisons
+#Permissions
 
 ```xml
 <!-- For internet. -->
