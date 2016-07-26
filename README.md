@@ -25,9 +25,15 @@ include ':easyYT'
 #Permisisons
 
 ```xml
-<uses-permission android:name="android.permission.INTERNET"/><uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/><!-- For authorization. -->
-<uses-permission android:name="android.permission.GET_ACCOUNTS"/><!-- For recording audio and video without going to lock.
---><uses-permission android:name="android.permission.RECORD_AUDIO"/><uses-permission android:name="android.permission.WAKE_LOCK"/><uses-permission android:name="android.permission.CAMERA"/>
+<!-- For internet. -->
+<uses-permission android:name="android.permission.INTERNET"/>
+<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+<!-- For authorization. -->
+<uses-permission android:name="android.permission.GET_ACCOUNTS"/>
+<!-- For recording audio and video without going to lock.-->
+<uses-permission android:name="android.permission.RECORD_AUDIO"/>
+<uses-permission android:name="android.permission.WAKE_LOCK"/>
+<uses-permission android:name="android.permission.CAMERA"/>
 ```
 #Code example
 
