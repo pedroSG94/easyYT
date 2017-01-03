@@ -2,13 +2,13 @@ package com.pedro.easyyt.youtubewrapper;
 
 import android.hardware.Camera;
 import android.util.Log;
-import android.view.SurfaceView;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
 import com.pedro.easyyt.app.executor.InteractorExecutor;
 import com.pedro.easyyt.app.executor.InteractorExecutorImp;
 import com.pedro.easyyt.app.executor.MainThreadExecutor;
 import com.pedro.easyyt.app.executor.MainThreadExecutorImp;
+import com.pedro.easyyt.domain.interactor.yasea.YaseaWrapper;
 import com.pedro.easyyt.domain.interactor.youtube.createevent.CreateEventInteractorImp;
 import com.pedro.easyyt.domain.interactor.youtube.endevent.EndEventInteractorImp;
 import com.pedro.easyyt.domain.interactor.youtube.startevent.StartEventInteractorImp;
@@ -16,6 +16,7 @@ import com.pedro.easyyt.domain.model.RecordDataConfig;
 import com.pedro.easyyt.domain.model.StreamDataInfo;
 import com.pedro.easyyt.presenter.YouTubePresenter;
 import com.pedro.easyyt.presenter.YouTubePresenterImp;
+import net.ossrs.yasea.SrsCameraView;
 
 /**
  * Created by pedro on 6/05/16.
@@ -24,7 +25,7 @@ public class EasyStream implements YouTubeComunication {
 
   private final String TAG = EasyStream.class.toString();
 
-  private SurfaceView surfaceView;
+  private SrsCameraView surfaceView;
   private GoogleAccountCredential credential;
   private Camera camera;
   private RecordDataConfig dataConfig;
@@ -38,6 +39,16 @@ public class EasyStream implements YouTubeComunication {
   private YouTubePresenter youTubePresenter;
   private StreamDataInfo streamDataInfo;
   private EasyYTCallback easyYTCallback;
+
+  public YaseaWrapper getYaseaWrapper() {
+    return yaseaWrapper;
+  }
+
+  public void setYaseaWrapper(YaseaWrapper yaseaWrapper) {
+    this.yaseaWrapper = yaseaWrapper;
+  }
+
+  private YaseaWrapper yaseaWrapper;
 
   public EasyStream(){
     MainThreadExecutor mainThreadExecutor = new MainThreadExecutorImp();
@@ -53,7 +64,7 @@ public class EasyStream implements YouTubeComunication {
     this.easyYTCallback = easyYTCallback;
   }
 
-  public void setSurfaceView(SurfaceView surfaceView) {
+  public void setSurfaceView(SrsCameraView surfaceView) {
     this.surfaceView = surfaceView;
   }
 
@@ -88,7 +99,7 @@ public class EasyStream implements YouTubeComunication {
   public void startStream(){
     Log.d(TAG, "starting...");
     if(id == null) {
-      youTubePresenter.startStream(credential, name, description, resolution, state, surfaceView, dataConfig, camera);
+      youTubePresenter.startStream(credential, name, description, resolution, state, yaseaWrapper, dataConfig, camera);
     }
     else{
       Log.e(TAG, "you are streaming, stop it if you want start other stream");
@@ -98,7 +109,7 @@ public class EasyStream implements YouTubeComunication {
   public void stopStream(){
     Log.d(TAG, "stopping stream...");
     if(id != null) {
-      youTubePresenter.stopStream(credential, streamDataInfo.getLiveBroadcast().getId());
+      youTubePresenter.stopStream(credential, streamDataInfo.getLiveBroadcast().getId(), yaseaWrapper);
       id = null;
     }
     else{

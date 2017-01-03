@@ -1,11 +1,10 @@
 package com.pedro.easyyt.presenter;
 
 import android.hardware.Camera;
-import android.view.SurfaceView;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
 import com.pedro.easyyt.domain.interactor.ffmpeg.RecordManager;
-import com.pedro.easyyt.domain.interactor.yasea.InitEncoderAndSend;
+import com.pedro.easyyt.domain.interactor.yasea.YaseaWrapper;
 import com.pedro.easyyt.domain.interactor.youtube.createevent.CreateEventInteractor;
 import com.pedro.easyyt.domain.interactor.youtube.endevent.EndEventInteractor;
 import com.pedro.easyyt.domain.interactor.youtube.startevent.StartEventInteractor;
@@ -91,7 +90,7 @@ public class YouTubePresenterImp extends YouTubePresenter{
 
     @Override
     public void startStream(final GoogleAccountCredential credential, String name, String description,
-                            String resolution, String state, final SurfaceView surfaceView,
+                            String resolution, String state, final YaseaWrapper yaseaWrapper,
                             final RecordDataConfig dataConfig, final Camera camera) {
         createEventInteractor.createEvent(credential, name, description, resolution, state,
                 new CreateEventInteractor.Callback() {
@@ -99,8 +98,9 @@ public class YouTubePresenterImp extends YouTubePresenter{
                     public void onSuccess(StreamDataInfo streamDataInfo, String endPoint) {
                         view.streamData(streamDataInfo);
                         /**start send and encoding data*/
-                        InitEncoderAndSend initEncoderAndSend = new InitEncoderAndSend(surfaceView);
-                        initEncoderAndSend.initAll(endPoint);
+                        yaseaWrapper.start(endPoint);
+                        //InitEncoderAndSend initEncoderAndSend = new InitEncoderAndSend(surfaceView);
+                        //initEncoderAndSend.initAll(endPoint);
                         startEventInteractor.startEvent(credential,
                                 streamDataInfo.getLiveBroadcast().getId(),
                                 new StartEventInteractor.Callback() {
@@ -134,11 +134,11 @@ public class YouTubePresenterImp extends YouTubePresenter{
     }
 
     @Override
-    public void stopStream(GoogleAccountCredential credential, String id) {
+    public void stopStream(GoogleAccountCredential credential, String id, final YaseaWrapper yaseaWrapper) {
         endEventInteractor.endEvent(credential, id, new EndEventInteractor.Callback() {
             @Override
             public void onSuccess() {
-                recordManager.stopRecording();
+                yaseaWrapper.stop();
                 view.streamingStopped();
             }
 

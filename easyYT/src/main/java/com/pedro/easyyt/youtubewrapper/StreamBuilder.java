@@ -1,23 +1,31 @@
 package com.pedro.easyyt.youtubewrapper;
 
 import android.util.Log;
-import android.view.SurfaceView;
+import com.github.faucamp.simplertmp.RtmpHandler;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.pedro.easyyt.constants.Resolution;
 import com.pedro.easyyt.constants.StreamState;
+import com.pedro.easyyt.domain.interactor.yasea.YaseaWrapper;
 import com.pedro.easyyt.domain.model.RecordDataConfig;
 import com.pedro.easyyt.exceptions.CameraException;
+import java.io.IOException;
+import java.net.SocketException;
+import net.ossrs.yasea.SrsCameraView;
+import net.ossrs.yasea.SrsEncodeHandler;
+import net.ossrs.yasea.SrsPublisher;
+import net.ossrs.yasea.SrsRecordHandler;
 
 /**
  * Created by pedro on 6/05/16.
  */
-public class StreamBuilder {
+public class StreamBuilder implements RtmpHandler.RtmpListener,
+    SrsRecordHandler.SrsRecordListener, SrsEncodeHandler.SrsEncodeListener{
 
   private final String TAG = StreamBuilder.class.toString();
 
   private static volatile StreamBuilder myInstance = null;
 
-  private SurfaceView surfaceView;
+  private SrsCameraView surfaceView;
   private EasyYTCallback easyYTCallback;
   private GoogleAccountCredential credential;
   private String resolution = Resolution.R_240P;
@@ -26,6 +34,7 @@ public class StreamBuilder {
   private int frameRate = 15;
   private int audioRateInHz = 44100;
   private String state = StreamState.PUBLIC;
+  private SrsPublisher srsPublisher;
 
   private StreamBuilder(){}
 
@@ -50,7 +59,7 @@ public class StreamBuilder {
     return this;
   }
 
-  public StreamBuilder setSurfaceView(SurfaceView surfaceView){
+  public StreamBuilder setSurfaceView(SrsCameraView surfaceView){
     this.surfaceView = surfaceView;
     return this;
   }
@@ -103,6 +112,14 @@ public class StreamBuilder {
       dataConfig.setAudioRateInHz(audioRateInHz);
       dataConfig.setResolution(resolution);
 
+      srsPublisher = new SrsPublisher(surfaceView);
+      srsPublisher.setEncodeHandler(new SrsEncodeHandler(this));
+      srsPublisher.setRtmpHandler(new RtmpHandler(this));
+      srsPublisher.setRecordHandler(new SrsRecordHandler(this));
+      srsPublisher.setPreviewResolution(640, 480);
+      YaseaWrapper yaseaWrapper = new YaseaWrapper();
+      yaseaWrapper.setSrsPublisher(srsPublisher);
+
       EasyStream easyStream = new EasyStream();
       easyStream.setEasyYTCallback(easyYTCallback);
       easyStream.setSurfaceView(surfaceView);
@@ -112,6 +129,7 @@ public class StreamBuilder {
       easyStream.setName(name);
       easyStream.setDescription(description);
       easyStream.setState(state);
+      easyStream.setYaseaWrapper(yaseaWrapper);
       return easyStream;
     }
     catch(CameraException e){
@@ -121,4 +139,113 @@ public class StreamBuilder {
     }
   }
 
+  @Override
+  public void onRtmpConnecting(String msg) {
+
+  }
+
+  @Override
+  public void onRtmpConnected(String msg) {
+
+  }
+
+  @Override
+  public void onRtmpVideoStreaming() {
+
+  }
+
+  @Override
+  public void onRtmpAudioStreaming() {
+
+  }
+
+  @Override
+  public void onRtmpStopped() {
+
+  }
+
+  @Override
+  public void onRtmpDisconnected() {
+
+  }
+
+  @Override
+  public void onRtmpVideoFpsChanged(double fps) {
+
+  }
+
+  @Override
+  public void onRtmpVideoBitrateChanged(double bitrate) {
+
+  }
+
+  @Override
+  public void onRtmpAudioBitrateChanged(double bitrate) {
+
+  }
+
+  @Override
+  public void onRtmpSocketException(SocketException e) {
+
+  }
+
+  @Override
+  public void onRtmpIOException(IOException e) {
+
+  }
+
+  @Override
+  public void onRtmpIllegalArgumentException(IllegalArgumentException e) {
+
+  }
+
+  @Override
+  public void onRtmpIllegalStateException(IllegalStateException e) {
+
+  }
+
+  @Override
+  public void onNetworkWeak() {
+
+  }
+
+  @Override
+  public void onNetworkResume() {
+
+  }
+
+  @Override
+  public void onEncodeIllegalArgumentException(IllegalArgumentException e) {
+
+  }
+
+  @Override
+  public void onRecordPause() {
+
+  }
+
+  @Override
+  public void onRecordResume() {
+
+  }
+
+  @Override
+  public void onRecordStarted(String msg) {
+
+  }
+
+  @Override
+  public void onRecordFinished(String msg) {
+
+  }
+
+  @Override
+  public void onRecordIllegalArgumentException(IllegalArgumentException e) {
+
+  }
+
+  @Override
+  public void onRecordIOException(IOException e) {
+
+  }
 }

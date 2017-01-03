@@ -31,4 +31,5 @@ dependencies {
   compile files('libs/javacpp-1.2.1.jar')
   compile files('libs/ffmpeg-3.0.2-1.2.jar')
   testCompile 'junit:junit:4.12'
+  compile project(':library')
 }

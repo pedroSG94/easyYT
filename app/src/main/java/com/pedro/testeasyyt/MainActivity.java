@@ -3,8 +3,8 @@ package com.pedro.testeasyyt;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.SurfaceView;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
 import com.pedro.easyyt.app.base.EasyYTActivity;
@@ -14,23 +14,26 @@ import com.pedro.easyyt.domain.model.StreamDataInfo;
 import com.pedro.easyyt.youtubewrapper.EasyStream;
 import com.pedro.easyyt.youtubewrapper.EasyYTCallback;
 import com.pedro.easyyt.youtubewrapper.StreamBuilder;
+import net.ossrs.yasea.SrsCameraView;
 
-public class MainActivity extends EasyYTActivity implements EasyYTCallback, Button.OnClickListener  {
+public class MainActivity extends EasyYTActivity implements EasyYTCallback, Button.OnClickListener {
 
     private Button button;
     private EasyStream easyStream;
-    private SurfaceView mCameraView;
+    private SrsCameraView mCameraView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         setContentView(R.layout.activity_main);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         chooseAccount();
 
+        mCameraView = (SrsCameraView) findViewById(R.id.surface);
+
         button = (Button) findViewById(R.id.button);
         button.setOnClickListener(this);
-        mCameraView = (SurfaceView) findViewById(R.id.surface);
         easyStream = StreamBuilder.getInstance()
             .setState(StreamState.PRIVATE)
             .setSurfaceView(mCameraView)
@@ -39,7 +42,6 @@ public class MainActivity extends EasyYTActivity implements EasyYTCallback, Butt
             .setEastYTCallback(this)
             .build();
     }
-
 
     @Override
     public void onClick(View v) {
